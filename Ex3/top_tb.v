@@ -17,7 +17,7 @@ module top_tb(
     parameter CLK_PERIOD = 10;
 
     //Registers
-    reg [7:0] counter_out;
+    wire [7:0] counter_out;
     reg clk;
     reg rst;
     reg change;
@@ -34,8 +34,9 @@ module top_tb(
     //Test whether the counter works
     initial begin
        clk=0;
+       rst=0; 
+       change=1;
        on_off=1;
-       counter_out=8'b00000000;
      end
     
             
@@ -45,7 +46,7 @@ module top_tb(
 //Todo: Finish test, check for success
 
 //The instantiation of the user's module
-     mymodule top (
+     monitor mymodule (
      .clk (clk),
      .rst (rst),
      .change (change),
