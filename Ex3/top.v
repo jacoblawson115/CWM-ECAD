@@ -27,16 +27,16 @@ module monitor (
 // logic
     always @ (posedge clk or posedge rst)
 	begin
-       if(rst)
-		counter_out <= 8'b00000000;
-	   else
-		if(change)
-		   counter_out <= counter_out;
-		else
-		  if(on_off)
-	     	 counter_out <= counter_out + 8'b00000001;
-		  else
-		     counter_out <= counter_out - 8'b00000001;
+       	  if(rst)
+	    counter_out <= 8'b00000000;
+          else
+            if(~change)
+              counter_out <= counter_out;
+	    else
+              if(on_off)
+	        counter_out <= counter_out + 8'b00000001;
+	      else
+		counter_out <= counter_out - 8'b00000001;
 	end
 
 endmodule

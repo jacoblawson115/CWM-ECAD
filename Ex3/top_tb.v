@@ -34,9 +34,10 @@ module top_tb(
     //Test whether the counter works
     initial begin
        clk=0;
-       rst=0; 
+       rst=1; 
        change=1;
        on_off=1;
+       #(CLK_PERIOD/2) rst=~rst;
      end
     
             
