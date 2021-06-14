@@ -13,16 +13,44 @@
 module top_tb(
     );
     
-//Todo: Parameters
+    //Parameters    
+    parameter CLK_PERIOD = 10;
 
-//Todo: Regitsers and wires
+    //Registers
+    reg [7:0] counter_out;
+    reg clk;
+    reg rst;
+    reg change;
+    reg on_off;
 
-//Todo: Clock generation
+    //Generate a clock signal
+    initial
+        begin
+            clk = 1'b0;
+            forever
+            #(CLK_PERIOD/2) clk=~clk;
+        end
+
+    //Test whether the counter works
+    initial begin
+       clk=0;
+       on_off=1;
+       counter_out=8'b00000000;
+     end
+    
+            
 
 //Todo: User logic
     
 //Todo: Finish test, check for success
 
-//Todo: Instantiate counter module
+//The instantiation of the user's module
+     mymodule top (
+     .clk (clk),
+     .rst (rst),
+     .change (change),
+     .on_off (on_off),
+     .counter_out (counter_out)
+     );
  
 endmodule 
