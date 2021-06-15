@@ -16,3 +16,30 @@
 //  You need to write the whole file.
 //////////////////////////////////////////////////////////////////////////////////
 
+`timescale 1ns / 100ps
+
+module leds (
+// declare inputs
+    input clk, rst, button,
+    output reg [2:0]colour
+    );
+
+    always @ (posedge clk or posedge rst)
+        if(rst)
+	     colour = 3'b001;
+	begin
+	case(colour)
+	     3'b000 : colour<=3'b001;
+	     3'b001 : colour = (button==1) ? 3'b010 : colour;
+             3'b010 : colour = (button==1) ? 3'b011 : colour;
+             3'b011 : colour = (button==1) ? 3'b100 : colour;
+             3'b100 : colour = (button==1) ? 3'b101 : colour;
+             3'b101 : colour = (button==1) ? 3'b110 : colour;
+             3'b110 : colour = (button==1) ? 3'b001 : colour;
+             3'b111 : colour<=3'b001;
+        endcase
+	end
+
+endmodule
+
+
