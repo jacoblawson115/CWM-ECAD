@@ -80,11 +80,10 @@ module top_tb(
                     if(counter_out != prv_val + 1) begin
                        $display("***TEST FAILED!***");
                        err=1;
-                    else
-                       if(counter_out != prv_val - 1) begin
-                         $display("***TEST FAILED!***");
-                         err=1;
-                       end
+                    end
+                    if(counter_out != prv_val - 1) begin
+                       $display("***TEST FAILED!***");
+                       err=1;
                     end
                  end
               end        
