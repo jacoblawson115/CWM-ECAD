@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 // Test bench for Exercise #4 - Dynamic LED lights
-// Student Name:
-// Date: 
+// Student Name: Jake Lawson
+// Date: 15/06/2021
 //
 // Description: A testbench module to test Ex4 - Dynamic LED lights
 // You need to write the whole file
@@ -19,9 +19,10 @@ module top_tb(
     reg clk;
     reg button;
     reg err;
+    reg [2:0] prv_val;
 
     //Wires
-    wire colour;
+    wire [2:0] colour;
 
     //Create clock signal
     initial
@@ -29,6 +30,7 @@ module top_tb(
        clk = 1'b0;
        forever
          #(CLK_PERIOD/2) clk=~clk;
+	 #(2*CLK_PERIOD) prv_val = colour;
      end
 
      //Move through states and check each step is successful
@@ -37,11 +39,21 @@ module top_tb(
 	rst = 1;
 	button = 0;
 	err = 0;
-	#(CLK_PERIOD/2) rst=~rst; 
-
+	#(0.75*(CLK_PERIOD/2)) rst=~rst; 
+ 
 	forever
-	   #CLK_PERIOD button=~button;	
+	  #CLK_PERIOD button=~button;
      end
+
+     always @ (posedge button)
+	begin
+	   if(colour!=3'b001)
+	     $display("***TEST FAILED!***");
+             err=1;
+	   end
+	end
+
+ 
 
 //The instantiation of the user's module
      leds mymodule (
@@ -50,3 +62,5 @@ module top_tb(
      .button (button),
      .colour (colour)
      );
+
+endmodule

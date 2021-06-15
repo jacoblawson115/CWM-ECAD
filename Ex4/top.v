@@ -1,7 +1,7 @@
 //////////////////////////////////////////////////////////////////////////////////
 // Exercise #4 - Dynamic LED lights
-// Student Name:
-// Date: 
+// Student Name: Jake Lawson
+// Date: 15/06/2021
 //
 //  Description: In this exercise, you need to design a LED based lighting solution, 
 //  following the diagram provided in the exercises documentation. The lights change 
@@ -25,19 +25,23 @@ module leds (
     );
 
     always @ (posedge clk or posedge rst)
-        if(rst)
+        begin
+	if(rst)
 	     colour = 3'b001;
-	begin
-	case(colour)
-	     3'b000 : colour<=3'b001;
-	     3'b001 : colour = (button==1) ? 3'b010 : colour;
-             3'b010 : colour = (button==1) ? 3'b011 : colour;
-             3'b011 : colour = (button==1) ? 3'b100 : colour;
-             3'b100 : colour = (button==1) ? 3'b101 : colour;
-             3'b101 : colour = (button==1) ? 3'b110 : colour;
-             3'b110 : colour = (button==1) ? 3'b001 : colour;
-             3'b111 : colour<=3'b001;
-        endcase
+	else
+	   begin
+	    if(button)
+	  	case(colour)
+		     3'b000 : colour<=3'b001;
+		     3'b001 : colour<=3'b010;
+		     3'b010 : colour<=3'b011;
+		     3'b011 : colour<=3'b100;
+		     3'b100 : colour<=3'b101;
+		     3'b101 : colour<=3'b110;
+		     3'b110 : colour<=3'b001;
+		     3'b111 : colour<=3'b001;
+          	endcase
+	   end
 	end
 
 endmodule
