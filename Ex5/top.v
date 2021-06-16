@@ -15,41 +15,39 @@
 
 module ac (
 // declare inputs
-    input clk, [4:0]temperature, initState
-    output reg heating,
-    output reg cooling,
+    input clk, [4:0] temperature, [1:0] initState,
+    output reg heating, 
+    output reg cooling
     );
 
 // define an internal state variable and keep it in a register
-    wire [1:0]st;
-    reg [1:0]state;
-    assign st = initState; //define initial state
-    state = st;
+    wire [1:0] initState;
+    reg [1:0] state; 
+    state = initState; //define initial state
 
 // logic to determine on clk edge the next state from temperature input and current state
-    always @ (posedge clk)
-       begin
-          if(state==2'b11 || state==2'bx) //illegal states - reject, go to idle
-             assign st = 2'b00;
+    always @ (posedge clk) begin
+
+          if(state==2'b11 || state==2'bx) begin //illegal states - reject, go to idle
+             state = 2'b00;
           end
 
-          if(state==2'b00) //idle state
-             assign st = (temperature >= 5'b10110) ? 2'b01: 
-                    (temperature <= 5'10010) ? 2'b10:
-                    2'b00;
+          if(state==2'b00) begin //at idle state
+             state = (temperature >= 5'd22) ? 2'b01 : 
+                     (temperature <= 5'd18) ? 2'b10 :
+                     2'b00;
           end
 
-          if(state==2'b01) //cooling state
-             assign st = (temperature <= 5'10100) ? 2'b00: 
-                    2'b01;
+          if(state==2'b01) begin //at cooling state
+             state = (temperature <= 5'd20) ? 2'b00 : 
+                     2'b01;
           end
  
-          if(state==2'b10) //heating state
-             assign st = (temperature >= 5'10100) ? 2'b00: 
-                    2'b10;
+          if(state==2'b10) begin //at heating state
+             state = (temperature >= 5'd20) ? 2'b00 : 
+                     2'b10;
           end
 
-          state = st; //update state to new state
           heating = state[1];
           cooling = state[0];
        end
