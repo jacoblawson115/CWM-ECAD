@@ -25,7 +25,7 @@ module leds (
     );
 
     always @ (posedge clk or posedge rst)
-        begin
+       begin
 	if(rst)
 	     colour = 3'b001;
 	else
@@ -42,7 +42,7 @@ module leds (
 		     3'b111 : colour<=3'b001;
           	endcase
 	   end
-	end
+       end
 
 endmodule
 

@@ -30,7 +30,12 @@ module top_tb(
        clk = 1'b0;
        forever
          #(CLK_PERIOD/2) clk=~clk;
-	 #(2*CLK_PERIOD) prv_val = colour;
+     end
+
+     //Save and keep track of the previous value in the sequence
+     initial begin
+       always @ (clk negedge)
+          prv_val = colour;
      end
 
      //Move through states and check each step is successful
@@ -44,14 +49,6 @@ module top_tb(
 	forever
 	  #CLK_PERIOD button=~button;
      end
-
-     always @ (posedge button)
-	begin
-	   if(colour!=3'b001)
-	     $display("***TEST FAILED!***");
-             err=1;
-	   end
-	end
 
  
 
