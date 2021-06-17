@@ -44,19 +44,22 @@ module top_tb(
     initial begin
        clk=0;
        rst=1; 
-       change=1;
-       on_off=1;
+       change=0;
+       on_off=0;
        err=0;
 
-       #(10*CLK_PERIOD) rst=~rst; //Set rst=0 after 10 clock periods
-       #(28*CLK_PERIOD) change=~change; //SEt change=0 after 28 clock periods
+       //reset and change signal generation
+       #(2*CLK_PERIOD) rst=~rst;
+       #(5*CLK_PERIOD) change=~change;
+       #(13*CLK_PERIOD) change=~change;
+       #(16*CLK_PERIOD) rst=~rst;
+       
     end
 
     //Switch on_off between counting up and counting down to check that it counts up when 1 and down when 0:
     initial begin
        forever
-         #(15*CLK_PERIOD) on_off=~on_off;
-         #(5*CLK_PERIOD) on_off=~on_off;
+         #(7*CLK_PERIOD) on_off=~on_off;
     end
     
 //Check for success
@@ -64,35 +67,34 @@ module top_tb(
         forever
         #(0.75*CLK_PERIOD)
           
-           if(rst) begin
+           if(rst) begin //check reset functionality
               if(prv_val!=00000000) begin
-                 $display("***TEST FAILED!***");
+                 $display("***TEST FAILED! - reset not working***");
                  err=1;
               end
-           else
-              if(~change) begin
+           end
+           
+           if(~change) begin //check change functionality
                  if(counter_out!=prv_val) begin
-                    $display("***TEST FAILED!***");
+                    $display("***TEST FAILED! - output not constant when change = 0***");
                     err=1;
                  end
-              else
-                 if(on_off) begin
+           else if(on_off) //given change is enabled, check on_off functionality
                     if(counter_out != prv_val + 1) begin
-                       $display("***TEST FAILED!***");
+                       $display("***TEST FAILED! - doesn't count up on on_off = 1***");
                        err=1;
                     end
+           else if(~on_off)
                     if(counter_out != prv_val - 1) begin
-                       $display("***TEST FAILED!***");
+                       $display("***TEST FAILED! - doesn't count down on on_off = 0***");
                        err=1;
                     end
-                 end
-              end        
            end
-        end
+     end
 
-//End test
+//End test and check for success
 initial begin
-    #100 
+    #300
     if (err==0)
        $display("***TEST PASSED! :) ***");
     $finish;
