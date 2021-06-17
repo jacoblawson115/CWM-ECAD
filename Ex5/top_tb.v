@@ -13,15 +13,18 @@ module top_tb(
 
     //Parameters    
     parameter CLK_PERIOD = 10;
+    parameter TEMP_PERIOD = 4*CLK_PERIOD;
 
     //Registers
     reg clk;
     reg [4:0] temperature;
-    reg [1:0] initState; //define an initial state so we can make sure our implementation works with all initial states and rejects illegal states
+    reg err;
 
     //Wires
     wire heating;
     wire cooling;
+    wire [1:0] state;
+    assign state = {heating,cooling};
 
     //Create clock signal
     initial
@@ -31,54 +34,79 @@ module top_tb(
          #(CLK_PERIOD/2) clk=~clk;
     end
 
-    //Create temperature signal (use different signals depending on initial state so we can cycle through states in order each time)
+    //Create temperature signal
     initial
     begin
-       initState = 2'b00; //choose initial state to try
+       //set initial state to idle
+       temperature = 5'd20; //should set the ac to idle
 
-       //starts from idle or illegal(->idle) state
-       if(initState == 2'b00 || initState == 2'b11 || initState == 2'bx) begin
-           temperature = 5'd20; //should maintain idle
-           #(2*CLK_PERIOD) temperature = 5'd25; //should enable cooling
-           #(4*CLK_PERIOD) temperature = 5'd27; //should maintain cooling
-           #(6*CLK_PERIOD) temperature = 5'd19; //should go back to idle
-           #(8*CLK_PERIOD) temperature = 5'd15; //should enable heating
-           #(10*CLK_PERIOD) temperature = 5'd19; //should maintain heating
-           #(12*CLK_PERIOD) temperature = 5'd20; //should go back to idle
-       end
-
-       //starts from cooling
-       if(initState == 2'b01) begin
-           temperature = 5'd23; //should maintain cooling
-           #(2*CLK_PERIOD) temperature = 5'd17; //should go to idle
-           #(4*CLK_PERIOD) temperature = 5'd19; //should maintain idle
-           #(6*CLK_PERIOD) temperature = 5'd18; //should enable heating
-           #(8*CLK_PERIOD) temperature = 5'd19; //should maintain heating
-           #(10*CLK_PERIOD) temperature = 5'd22; //should go back to idle
-           #(12*CLK_PERIOD) temperature = 5'd21; //should maintain idle
-       end
-
-       //starts from heating
-       if(initState == 2'b10) begin
-           temperature = 5'd13; //should maintain heating
-           #(2*CLK_PERIOD) temperature = 5'd20; //should go to idle
-           #(4*CLK_PERIOD) temperature = 5'd19; //should maintain idle
-           #(6*CLK_PERIOD) temperature = 5'd26; //should enable cooling
-           #(8*CLK_PERIOD) temperature = 5'd24; //should maintain cooling
-           #(10*CLK_PERIOD) temperature = 5'd17; //should go back to idle
-           #(12*CLK_PERIOD) temperature = 5'd19; //should maintain idle
-       end
+           #(TEMP_PERIOD) temperature = 5'd25; //should enable cooling
+           #(TEMP_PERIOD) temperature = 5'd27; //should maintain cooling
+           #(TEMP_PERIOD) temperature = 5'd19; //should go back to idle
+	   #(TEMP_PERIOD) temperature = 5'd21; //should maintain idle
+           #(TEMP_PERIOD) temperature = 5'd15; //should enable heating
+           #(TEMP_PERIOD) temperature = 5'd19; //should maintain heating
+           #(TEMP_PERIOD) temperature = 5'd20; //should go back to idle
 
     end
 
-    //Check for failures/successes and end the simulation
-    
+    //Check for failures
+    initial begin
+      err = 0;
 
-//The instantiation of the ac module
+      #(2*CLK_PERIOD) if(state != 2'b00) begin
+          $display("***TEST FAILED on setting to idle!***");
+          err=1;
+          end
+      #(TEMP_PERIOD) if(state != 2'b01) begin
+          $display("***TEST FAILED on transition idle -> cooling!***");
+          err=1;
+          end
+      #(TEMP_PERIOD) if(state != 2'b01) begin
+          $display("***TEST FAILED on maintaining cooling!***");
+          err=1;
+          end
+      #(TEMP_PERIOD) if(state != 2'b00) begin
+          $display("***TEST FAILED on transition cooling -> idle!***");
+          err=1;
+          end
+      #(TEMP_PERIOD) if(state != 2'b00) begin
+          $display("***TEST FAILED on maintaining idle!***");
+          err=1;
+          end
+      #(TEMP_PERIOD) if(state != 2'b10) begin
+          $display("***TEST FAILED on transition idle -> heating!***");
+          err=1;
+          end
+      #(TEMP_PERIOD) if(state != 2'b10) begin
+          $display("***TEST FAILED on maintaining heating!***");
+          err=1;
+          end
+      #(TEMP_PERIOD) if(state != 2'b00) begin
+          $display("***TEST FAILED on transition heating -> idle!***");
+          err=1;
+          end
+    end
+
+    //Check for illegal states
+    always @ (posedge clk or negedge clk)
+        if(state == 2'b11) begin
+          $display("***TEST FAILED - detected illegal state!***");
+          err=1;
+        end
+
+    //End the simulation end check for success
+    initial begin
+      #(32*CLK_PERIOD)
+      if(err==0)
+        $display("***TEST PASSED! :) ***");
+      $finish;
+    end
+    
+   //The instantiation of the ac module
      ac mymodule (
      .clk (clk),
      .temperature (temperature),
-     .initState (initState),
      .heating (heating),
      .cooling (cooling)
      );
