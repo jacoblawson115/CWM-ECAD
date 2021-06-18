@@ -1,0 +1,22 @@
+1) Were there any errors? Critical warnings?
+No
+
+2) What is the worst case hold time of the design?
+0.143
+
+3) What is the worst case setup time of the design?
+
+
+4) How many LUT were used by the design?
+4
+
+5) How many FF were used by the design?
+2
+
+6) How much block RAM was used by the design?
+0
+
+7) What is the expected power consumptions of the design?
+2.474
+
+8) How long did it take to synthesize and implement the design? 
