@@ -11,12 +11,11 @@
 //  outputs:
 //           heating, cooling
 //////////////////////////////////////////////////////////////////////////////////
-
+`timescale 1ns / 100ps
 
 module top(
-    input clk_p,
-    input clk_n,
-     //Todo: add all other ports besides clk_n and clk_p 
+    input clk_p, clk_n, rst_n, [4:0] temperature,
+    output heating, cooling
    );
     
 
@@ -36,6 +35,13 @@ module top(
 	.O  (clk)
       );
 
-//Add logic here
+	//instance of the ac module
+	ac myac(
+    	.clk (clk), 
+        .temperature (temperature), 
+        .heating (heating), 
+        .cooling (cooling)
+	);
+
 
 endmodule
